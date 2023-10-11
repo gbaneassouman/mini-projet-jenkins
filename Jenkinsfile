@@ -1,12 +1,14 @@
+/* groovylint-disable NglParseError */
 /* groovylint-disable-next-line CompileStatic */
+/* groovylint-disable-next-line CompileStatic, NglParseError */
 pipeline {
-    environment { 
-        IMAGE_NAME = ""
-        IMAGE_TAG = "latest"
-        INTERNAL_PORT = ""
-        DOCKER_ID = ""
-        CONTAINER_IMAGE = ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
-    }
+    // environment {
+    //     IMAGE_NAME = ""
+    //     IMAGE_TAG = "latest"
+    //     INTERNAL_PORT = ""
+    //     DOCKER_ID = ""
+    //     CONTAINER_IMAGE = ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
+    // }
     agent none
     stages {
         stage('Build image') {
