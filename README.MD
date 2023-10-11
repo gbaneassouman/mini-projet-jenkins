@@ -28,10 +28,11 @@ J’ai choisi 03 VPS de type Lightsail chez *AWS* *(01 pour Jenkins, 01 pour sta
 Sur chaque VPS j’ai installé  Debian 11.4, docker et docker-compose
 Sur le VPS de jenkins :
   j’ai installé jenkins à l’aide de docker-compose. Dans ma configuration le conteneur n’est accessible que sur la machine hôte à partir de  **127.0.0.1:8080**
-[](docker-ps.png)
+![](docker-ps-a.png)
 Afin d’accéder à jenkins en dehors de l’hôte , j’ai installé Apache2 et fais un reverse proxy sur le **127.0.0.1:8080**
 
-[](apache.png)
+![](apache.png)
 
 et à la fin configuré letsencrypt avec un sous-domaine.
-[](jenkins-url.jpg)
+
+![](jenkins-url.jpg)
