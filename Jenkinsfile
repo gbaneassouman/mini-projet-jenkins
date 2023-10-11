@@ -13,7 +13,7 @@ pipeline {
             agent any
             steps {
                 script {
-                    sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+                    sh 'git clone https://github.com/gbaneassouman/mini-projet-jenkins.git'
                 }
             }
         }
@@ -21,7 +21,7 @@ pipeline {
             agent any
             steps {
                 script {
-                    sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+                    sh 'echo Test'
                 }
             }
         }
@@ -29,7 +29,7 @@ pipeline {
             agent any
             steps {
                 script {
-                    sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+                    sh 'echo release'
                 }
             }
         }
@@ -37,7 +37,7 @@ pipeline {
             agent any
             steps {
                 script {
-                    sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+                    sh 'echo clean'
                 }
             }
         }
