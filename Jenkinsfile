@@ -7,7 +7,11 @@ pipeline {
         stage('Cloning code') {
             steps {
                 script {
-                    sh 'git clone https://github.com/gbaneassouman/mini-projet-jenkins.git'
+                    sh '''
+                    docker rm -rf mini-projet-jenkins
+                    sleep 5
+                    git clone https://github.com/gbaneassouman/mini-projet-jenkins.git
+                    '''
                 }
             }
         }
@@ -36,7 +40,10 @@ pipeline {
         stage('Clean image') {
             steps {
                 script {
-                    sh 'echo clean'
+                    sh '''
+                    echo clean
+                    rm -rf 
+                    '''
                 }
             }
         }
