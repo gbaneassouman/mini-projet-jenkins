@@ -15,14 +15,19 @@ pipeline {
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
-                    sh 'docker build -t ${IMAGE_NAME} .'
+                    sh 'docker build -t ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG} .'
                 }
             }
         }
         stage('Test image') {
             steps {
                 script {
-                    sh 'echo Test'
+                    /* groovylint-disable-next-line GStringExpressionWithinString */
+                    sh '''
+                        docker rm -f ${CONTAINER} || echo "container does not exist"
+                        docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}
+                        curl http://172.17.0.1:${HOST_PORT}| grep -q "DIMENSION"
+                    '''
                 }
             }
         }
