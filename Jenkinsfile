@@ -50,6 +50,21 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Satging') {
+            // environment {
+            //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
+            // }
+            steps {
+                script {
+                    /* groovylint-disable-next-line GStringExpressionWithinString */
+                    sh '''
+                        ssh admin@{STAGING}
+                        ls -la
+                    '''
+                }
+            }
+        }
         stage('Clean image') {
             steps {
                 script {
