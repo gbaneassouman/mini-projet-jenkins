@@ -7,7 +7,11 @@ pipeline {
         stage('Cloning code') {
             steps {
                 script {
-                    sh 'git clone https://github.com/gbaneassouman/mini-projet-jenkins.git'
+                    sh '''
+                        rm -rf mini-projet-jenkins || echo "Directory doesn't exists "
+                        sleep 2
+                        git clone https://github.com/gbaneassouman/mini-projet-jenkins.git
+                    '''
                 }
             }
         }
