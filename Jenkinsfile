@@ -2,6 +2,9 @@
 /* groovylint-disable-next-line CompileStatic */
 /* groovylint-disable-next-line CompileStatic, NglParseError */
 pipeline {
+    // environment {
+    //     ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
+    // }
     agent any //declaration globale de l'agent
     stages {
         stage('Cloning code') {
@@ -20,7 +23,7 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
-                        docker build -t ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG} .
+                        docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                     '''
                 }
             }
@@ -47,6 +50,7 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
+                        docker tag ${IMAGE_NAME} ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
                         echo $DOCKERHUB_PASSWORD_PSW | docker login -u openlab89 --password-stdin
                         docker push ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
                     '''
@@ -54,26 +58,27 @@ pipeline {
             }
         }
 
-        stage('Deploy to Satging') {
-            // environment {
-            //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
-            // }
-            steps {
-                script {
-                    /* groovylint-disable-next-line GStringExpressionWithinString */
-                    sh '''
-                        ssh admin@${STAGING}
-                    '''
-                }
-            }
-        }
+        // stage('Deploy to Satging') {
+        //     // environment {
+        //     //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
+        //     // }
+        //     steps {
+        //         script {
+        //             /* groovylint-disable-next-line GStringExpressionWithinString */
+        //             sh '''
+        //                 ssh -i ${SSH-KEY} admin@${STAGING}
+        //             '''
+        //         }
+        //     }
+        // }
         stage('Clean image') {
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
+                        docker stop ${CONTAINER}
                         docker rm -f ${CONTAINER}
-                        docker rm -f ${IMAGE_NAME}
+                        docker rmi -f ${IMAGE_NAME}
                     '''
                 }
             }
