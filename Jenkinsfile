@@ -20,8 +20,6 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
-                        /* groovylint-disable-next-line LineLength */
-                        docker ps -a| grep -i ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG} && docker stop ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG} && docker rm ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
                         docker build -t ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG} .
                     '''
                 }
@@ -32,6 +30,7 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
+                        docker ps -a|grep -i ${CONTAINER} && docker stop ${CONTAINER}
                         docker rm -f ${CONTAINER} || echo "container does not exist"
                         docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}
                         sleep 10
