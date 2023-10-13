@@ -33,7 +33,6 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
-                        docker ps -a|grep -i ${CONTAINER} && docker stop ${CONTAINER}
                         docker rm -f ${CONTAINER} || echo "container does not exist"
                         docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}
                         sleep 10
