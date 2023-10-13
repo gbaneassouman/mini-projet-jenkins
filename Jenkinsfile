@@ -1,4 +1,4 @@
-/* groovylint-disable NglParseError */
+/* groovylint-disable GStringExpressionWithinString, NglParseError */
 /* groovylint-disable-next-line CompileStatic */
 /* groovylint-disable-next-line CompileStatic, NglParseError */
 pipeline {
@@ -32,12 +32,10 @@ pipeline {
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
-                    sh '''
-                        docker rm -f ${CONTAINER} || echo "container does not exist"
-                        docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}
-                        sleep 10
-                        curl http://172.17.0.1:${HOST_PORT}
-                    '''
+                    sh 'docker rm -f ${CONTAINER} || echo "container does not exist"'
+                    sh 'docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}'
+                    sh 'sleep 10'
+                    sh 'curl http://172.17.0.1:${HOST_PORT}'
                 }
             }
         }
