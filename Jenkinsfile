@@ -37,9 +37,16 @@ pipeline {
             }
         }
         stage('Release image') {
+            environment {
+                DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
+            }
             steps {
                 script {
-                    sh 'echo release'
+                    /* groovylint-disable-next-line GStringExpressionWithinString */
+                    sh '''
+                        echo $DOCKERHUB_PASSWORD | docker login -u $DOCKER_ID --password-stdin
+                        docker push ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
+                    '''
                 }
             }
         }
