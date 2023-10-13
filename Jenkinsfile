@@ -44,7 +44,7 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
-                        echo $DOCKERHUB_PASSWORD | docker login -u $DOCKER_ID --password-stdin
+                        echo $DOCKERHUB_PASSWORD | docker login -u openlab89 --password-stdin
                         docker push ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
                     '''
                 }
@@ -53,9 +53,10 @@ pipeline {
         stage('Clean image') {
             steps {
                 script {
+                    /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
-                    echo clean
-                    rm -rf 
+                        docker rm -f ${CONTAINER}
+                        docker rm -f ${IMAGE_NAME}
                     '''
                 }
             }
