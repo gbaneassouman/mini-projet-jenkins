@@ -19,7 +19,11 @@ pipeline {
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
-                    sh 'docker build -t ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG} .'
+                    sh '''
+                        /* groovylint-disable-next-line LineLength */
+                        docker ps -a| grep -i ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG} && docker stop ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG} && docker rm ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
+                        docker build -t ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG} .
+                    '''
                 }
             }
         }
@@ -60,7 +64,6 @@ pipeline {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
                         ssh admin@${STAGING}
-                        ls -la
                     '''
                 }
             }
