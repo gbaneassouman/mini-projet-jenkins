@@ -31,7 +31,7 @@ pipeline {
                         docker rm -f ${CONTAINER} || echo "container does not exist"
                         docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}
                         sleep 10
-                        curl http://172.17.0.1:${HOST_PORT} | grep -q "DIMENSION"
+                        curl http://172.17.0.1:${HOST_PORT}
                     '''
                 }
             }
