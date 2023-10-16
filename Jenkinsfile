@@ -30,7 +30,7 @@ pipeline {
                     '''
                 }
             }
-    }
+        }
         stage('Test image') {
             steps {
                 script {
@@ -51,22 +51,12 @@ pipeline {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
                         docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                        echo $DOCKERHUB_PASSWORD_PSW | docker login -u openlab89 --password-stdin
+                        echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
                         docker push ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                     '''
                 }
             }
         }
-        // stage('SSH') {
-        //     steps {
-        //         sshagent(['SSH-KEY']) {
-        //             sh '''
-        //             ssh -o StrictHostKeyChecking=no -l ${USERNAME} ${STAGING} uname -a
-        //         '''
-        //         }
-
-        //     }
-        // }
         stage('Deploy to Satging') {
             steps {
                 script {
@@ -81,19 +71,20 @@ pipeline {
                     }
                 }
             }
-            stage('Clean image') {
-                steps {
-                    script {
-                    /* groovylint-disable-next-line GStringExpressionWithinString */
-                        sh '''
-                        docker stop ${CONTAINER}
-                        docker rm -f ${CONTAINER}
-                        docker rmi -f ${IMAGE_NAME}
-                    '''
-                    }
+        }
+        stage('Clean image') {
+            steps {
+                script {
+                /* groovylint-disable-next-line GStringExpressionWithinString */
+                    sh '''
+                    docker stop ${CONTAINER}
+                    docker rm -f ${CONTAINER}
+                    docker rmi -f ${IMAGE_NAME}
+                '''
                 }
             }
         }
     }
 }
+// }
 
