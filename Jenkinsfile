@@ -63,10 +63,10 @@ pipeline {
                     /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
                     sshagent(['SSH-KEY']) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no -l ${USERNAME} ${STAGING} uname -a
-                            echo $DOCKERHUB_PASSWORD_PSW | docker login -u openlab89 --password-stdin
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} uname -a
+                            echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
                             docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                            docker run --name ${STAGING-NAME} -d -p ${HOST_PORT}:${INTERNAL} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                         '''
                     }
                 }
