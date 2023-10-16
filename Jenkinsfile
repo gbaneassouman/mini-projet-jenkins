@@ -58,7 +58,7 @@ pipeline {
             steps {
                 sshagent(['SSH-KEY']) {
                     sh '''
-                    ssh -o StrickHostKeyChecking=no -l admin ${STAGING} uname -a
+                    ssh -o StrictHostKeyChecking=no -l admin ${STAGING} uname -a
                 '''
                 }
 
