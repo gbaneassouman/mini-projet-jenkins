@@ -63,7 +63,7 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
-                        ssh -i ${SSH-KEY} admin@${STAGING}
+                        ssh -i ${SSH_KEY} admin@${STAGING}
                     '''
                 }
             }
