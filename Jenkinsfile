@@ -58,7 +58,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-credentials-id']) {
                     sh '''
-                    ssh admin@${STAGING}
+                    ssh -i ${SSH_KEY} admin@${STAGING}
                 '''
                 }
             }
