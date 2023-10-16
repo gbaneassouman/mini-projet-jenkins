@@ -18,16 +18,16 @@ pipeline {
                 }
             }
         }
-        stage('Build image') {
-            steps {
-                script {
-                    /* groovylint-disable-next-line GStringExpressionWithinString */
-                    sh '''
-                        docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                    '''
-                }
-            }
-        }
+        // stage('Build image') {
+        //     steps {
+        //         script {
+        //             /* groovylint-disable-next-line GStringExpressionWithinString */
+        //             sh '''
+        //                 docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+        //             '''
+        //         }
+        //     }
+        // }
         // stage('Test image') {
         //     steps {
         //         script {
@@ -55,19 +55,19 @@ pipeline {
         //     }
         // }
 
-        stage('Deploy to Satging') {
-            // environment {
-            //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
-            // }
-            steps {
-                script {
-                    /* groovylint-disable-next-line GStringExpressionWithinString */
-                    sh '''
-                        ssh -i ${SSH_KEY} admin@${STAGING}
-                    '''
-                }
-            }
-        }
+        // stage('Deploy to Satging') {
+        //     // environment {
+        //     //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
+        //     // }
+        //     steps {
+        //         script {
+        //             /* groovylint-disable-next-line GStringExpressionWithinString */
+        //             sh '''
+        //                 ssh -i ${SSH_KEY} admin@${STAGING}
+        //             '''
+        //         }
+        //     }
+        // }
         // stage('Clean image') {
         //     steps {
         //         script {
