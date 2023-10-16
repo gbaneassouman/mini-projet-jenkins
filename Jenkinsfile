@@ -1,4 +1,4 @@
-/* groovylint-disable GStringExpressionWithinString, LineLength, NglParseError */
+/* groovylint-disable GStringExpressionWithinString, LineLength, NestedBlockDepth, NglParseError */
 /* groovylint-disable-next-line CompileStatic */
 /* groovylint-disable-next-line CompileStatic, NglParseError */
 pipeline {
@@ -18,9 +18,10 @@ pipeline {
                 }
             }
         }
-        stage('Build image') {environment {
-                DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
-            }
+        stage('Build image') {
+            // {environment {
+            //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
+            // }
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
@@ -29,7 +30,7 @@ pipeline {
                     '''
                 }
             }
-        }
+    }
         stage('Test image') {
             steps {
                 script {
@@ -42,9 +43,9 @@ pipeline {
             }
         }
         stage('Release image') {
-            environment {
-                DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
-            }
+            // environment {
+            //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
+            // }
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
@@ -67,10 +68,9 @@ pipeline {
         //     }
         // }
         stage('Deploy to Satging') {
-
             steps {
                 script {
-                    /* groovylint-disable-next-line GStringExpressionWithinString */
+                    /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
                     sshagent(['SSH-KEY']) {
                         sh '''
                             ssh -o StrictHostKeyChecking=no -l ${USERNAME} ${STAGING} uname -a
@@ -78,20 +78,22 @@ pipeline {
                             docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                             docker run --name ${STAGING-NAME} -d -p ${HOST_PORT}:${INTERNAL} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                         '''
+                    }
                 }
             }
-        }
-        stage('Clean image') {
-            steps {
-                script {
+            stage('Clean image') {
+                steps {
+                    script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
-                    sh '''
+                        sh '''
                         docker stop ${CONTAINER}
                         docker rm -f ${CONTAINER}
                         docker rmi -f ${IMAGE_NAME}
                     '''
+                    }
                 }
             }
         }
     }
 }
+
