@@ -56,37 +56,38 @@ pipeline {
         // }
         stage('SSH') {
             steps {
-                sshagent(credentials: ['ssh-credentials-id']) {
+                sshagent(['SSH-KEY']) {
                     sh '''
-                    ssh -i ${SSH_KEY} admin@${STAGING}
+                    ssh -o StrickHostKeyChecking=no -l admin ${STAGING} uname -a
                 '''
                 }
+
             }
         }
-    // stage('Deploy to Satging') {
-    //     // environment {
-    //     //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
-    //     // }
-    //     steps {
-    //         script {
-    //             /* groovylint-disable-next-line GStringExpressionWithinString */
-    //             sh '''
-    //                 ssh -i ${SSH_KEY} admin@${STAGING}
-    //             '''
-    //         }
-    //     }
-    // }
-    // stage('Clean image') {
-    //     steps {
-    //         script {
-    //             /* groovylint-disable-next-line GStringExpressionWithinString */
-    //             sh '''
-    //                 docker stop ${CONTAINER}
-    //                 docker rm -f ${CONTAINER}
-    //                 docker rmi -f ${IMAGE_NAME}
-    //             '''
-    //         }
-    //     }
-    // }
+        // stage('Deploy to Satging') {
+        //     // environment {
+        //     //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
+        //     // }
+        //     steps {
+        //         script {
+        //             /* groovylint-disable-next-line GStringExpressionWithinString */
+        //             sh '''
+        //                 ssh -i ${SSH_KEY} admin@${STAGING}
+        //             '''
+        //         }
+        //     }
+        // }
+        // stage('Clean image') {
+        //     steps {
+        //         script {
+        //             /* groovylint-disable-next-line GStringExpressionWithinString */
+        //             sh '''
+        //                 docker stop ${CONTAINER}
+        //                 docker rm -f ${CONTAINER}
+        //                 docker rmi -f ${IMAGE_NAME}
+        //             '''
+        //         }
+        //     }
+        // }
+        }
     }
-}
