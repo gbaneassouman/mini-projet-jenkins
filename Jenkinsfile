@@ -47,9 +47,9 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
-                        docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
+                        docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                         echo $DOCKERHUB_PASSWORD_PSW | docker login -u openlab89 --password-stdin
-                        docker push ${DOCKER_ID}/${IMAGE_NAME}:${IMAGE_TAG}
+                        docker push ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                     '''
                 }
             }
