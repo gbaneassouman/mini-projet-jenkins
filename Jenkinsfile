@@ -60,7 +60,7 @@ pipeline {
                     sh '''
                     [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                     ssh-keyscan -t rsa,dsa ${STAGING} >> ~/.ssh/known_hosts
-                    ssh admin@${STAGING}
+                    ssh -i ${SSH_KEY} admin@${STAGING}
                 '''
                 }
             }
