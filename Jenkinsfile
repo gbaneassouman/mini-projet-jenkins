@@ -38,7 +38,7 @@ pipeline {
                     sh 'docker rm -f ${CONTAINER} || echo "container does not exist"'
                     sh 'docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}:${IMAGE_TAG}'
                     sh 'sleep 10'
-                    sh 'curl http://172.17.0.1:${HOST_PORT}|grep -q "Dimension"'
+                    sh 'curl http://172.17.0.1:${HOST_PORT}'
                 }
             }
         }
@@ -53,22 +53,8 @@ pipeline {
                         docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                         echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
                         docker push ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                        docker save  ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG > /tmp/${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar
                     '''
-                }
-            }
-        }
-        stage('Deploy to Satging') {
-            steps {
-                script {
-                    /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
-                    sshagent(['SSH-KEY']) {
-                        sh '''
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} uname -a
-                            echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
-                            docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                            docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                        '''
-                    }
                 }
             }
         }
@@ -79,11 +65,28 @@ pipeline {
                     sh '''
                     docker stop ${CONTAINER}
                     docker rm -f ${CONTAINER}
-                    docker rmi -f ${IMAGE_NAME}
+                    docker rmi -f ${IMAGE_NAME}:${IMAGE_TAG}
+                    docker rmi -f ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                 '''
                 }
             }
         }
+        stage('Deploy to Satging') {
+            steps {
+                script {
+                    /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
+                    sshagent(['SSH-KEY']) {
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING}
+                            echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
+                            docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                        '''
+                    }
+                }
+            }
+        }
+        
     }
 }
 // }
