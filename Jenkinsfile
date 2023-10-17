@@ -102,7 +102,7 @@ pipeline {
                                     remoteDirectory: '/home/admin/artifacts',
                                     remoteDirectorySDF: false,
                                     removePrefix: '',
-                                    sourceFiles: '${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar')],
+                                    sourceFiles: '$IMAGE_NAME:$IMAGE_TAG.tar')],
                                     usePromotionTimestamp: false,
                                     useWorkspaceInPromotion: false,
                                     verbose: false)
