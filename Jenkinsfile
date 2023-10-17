@@ -19,9 +19,6 @@ pipeline {
             }
         }
         stage('Build image') {
-            // {environment {
-            //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
-            // }
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
@@ -38,14 +35,11 @@ pipeline {
                     sh 'docker rm -f ${CONTAINER} || echo "container does not exist"'
                     sh 'docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}:${IMAGE_TAG}'
                     sh 'sleep 10'
-                    sh 'curl http://172.17.0.1:${HOST_PORT}'
+                    sh 'curl http://172.17.0.1:${HOST_PORT}|grep -q HTML5 UP'
                 }
             }
         }
         stage('Release image') {
-            // environment {
-            //     DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
-            // }
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
@@ -53,7 +47,7 @@ pipeline {
                         docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                         echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
                         docker push ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                        docker save $IMAGE_NAME:$IMAGE_TAG > /home/admin/${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar
+                        docker save $IMAGE_NAME:$IMAGE_TAG > /home/admin/artifacts/${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar
                     '''
                 }
             }
@@ -105,10 +99,10 @@ pipeline {
                                     noDefaultExcludes: false,
                                     patternSeparator: '[, ]+',
                                     /* groovylint-disable-next-line LineLength */
-                                    remoteDirectory: 'artifacts',
+                                    remoteDirectory: '/home/admin/artifacts',
                                     remoteDirectorySDF: false,
                                     removePrefix: '',
-                                    sourceFiles: '/home/admin/${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar')],
+                                    sourceFiles: '${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar')],
                                     usePromotionTimestamp: false,
                                     useWorkspaceInPromotion: false,
                                     verbose: false)
