@@ -47,7 +47,7 @@ pipeline {
                         docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                         echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
                         docker push ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                        docker save $IMAGE_NAME:$IMAGE_TAG > /home/admin/artifacts/${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar
+                        docker save $IMAGE_NAME:$IMAGE_TAG > /home/admin/artifacts/$IMAGE_NAME:$IMAGE_TAG.tar
                     '''
                 }
             }
@@ -86,7 +86,7 @@ pipeline {
                                 [sshTransfer(cleanRemote: false,
                                 excludes: '',
                                 execCommand: '''
-                                    docker  load -i ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar
+                                    docker  load -i $IMAGE_NAME:$IMAGE_TAG.tar
                                     sleep 10
                                     /* groovylint-disable-next-line LineLength */
                                     docker run --name ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG -d -p ${HOST_PORT}:${INTERNAL_PORT} ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG
