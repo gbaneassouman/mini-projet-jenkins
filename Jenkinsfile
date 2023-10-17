@@ -44,7 +44,7 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
-                        docker save ${IMAGE_NAME}:${IMAGE_TAG} > /home/admin/artifacts/${IMAGE_NAME}:${IMAGE_TAG}.tar
+                        docker save ${IMAGE_NAME}:${IMAGE_TAG} > /tmp/${IMAGE_NAME}:${IMAGE_TAG}.tar
                         docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                         echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
                         docker push ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
@@ -99,7 +99,7 @@ pipeline {
                                     noDefaultExcludes: false,
                                     patternSeparator: '[, ]+',
                                     /* groovylint-disable-next-line LineLength */
-                                    remoteDirectory: '/home/admin/artifacts',
+                                    remoteDirectory: '/tmp/',
                                     remoteDirectorySDF: false,
                                     removePrefix: '',
                                     sourceFiles: '${IMAGE_NAME}:${IMAGE_TAG}')],
