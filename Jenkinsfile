@@ -53,7 +53,7 @@ pipeline {
                         docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                         echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
                         docker push ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                        docker save $IMAGE_NAME:$IMAGE_TAG > /tmp/${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar
+                        docker save $IMAGE_NAME:$IMAGE_TAG > /home/admin/${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar
                     '''
                 }
             }
@@ -108,7 +108,7 @@ pipeline {
                                     remoteDirectory: 'artifacts',
                                     remoteDirectorySDF: false,
                                     removePrefix: '',
-                                    sourceFiles: '/tmp/${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar')],
+                                    sourceFiles: '/home/admin/${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG.tar')],
                                     usePromotionTimestamp: false,
                                     useWorkspaceInPromotion: false,
                                     verbose: false)
