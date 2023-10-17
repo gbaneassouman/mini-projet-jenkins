@@ -65,7 +65,9 @@ pipeline {
                     sh '''
                     docker stop ${CONTAINER}
                     docker rm -f ${CONTAINER}
+                    docker rmi -f ${IMAGE_NAME}
                     docker rmi -f ${IMAGE_NAME}:${IMAGE_TAG}
+                    docker rmi -f ${DOCKER_HUB}/${IMAGE_NAME}
                     docker rmi -f ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                     kill $(ps aux | grep '5000' | awk '{print $2}')
 
