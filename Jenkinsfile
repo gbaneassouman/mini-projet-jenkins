@@ -63,12 +63,12 @@ pipeline {
                 script {
                 /* groovylint-disable-next-line GStringExpressionWithinString */
                 //ps aux  |  grep -i 5000  |  awk '{print $2}'  |  xargs sudo kill -9
+                //kill $(ps aux | grep '5000' | awk '{print $2}')
                     sh '''
                     docker stop ${CONTAINER}
                     docker rm -f ${CONTAINER}
                     docker rmi -f ${IMAGE_NAME}
                     docker rmi -f ${DOCKER_HUB}/${IMAGE_NAME}
-                    kill $(ps aux | grep '5000' | awk '{print $2}')
                 '''
                 }
             }
