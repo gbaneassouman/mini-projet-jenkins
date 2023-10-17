@@ -44,10 +44,10 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
+                        docker save ${IMAGE_NAME}:${IMAGE_TAG} > /home/admin/artifacts/${IMAGE_NAME}:${IMAGE_TAG}.tar
                         docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                         echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
                         docker push ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                        docker save $IMAGE_NAME:$IMAGE_TAG > /home/admin/artifacts/$IMAGE_NAME:$IMAGE_TAG.tar
                     '''
                 }
             }
@@ -86,10 +86,10 @@ pipeline {
                                 [sshTransfer(cleanRemote: false,
                                 excludes: '',
                                 execCommand: '''
-                                    docker  load -i $IMAGE_NAME:$IMAGE_TAG.tar
+                                    docker  load -i ${IMAGE_NAME}:${IMAGE_TAG}
                                     sleep 10
                                     /* groovylint-disable-next-line LineLength */
-                                    docker run --name ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG -d -p ${HOST_PORT}:${INTERNAL_PORT} ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG
+                                    docker run --name ${IMAGE_NAME}:${IMAGE_TAG} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG
                                     sleep 5
                                     /* groovylint-disable-next-line LineLength */
                                     curl 172.17.0.1:${HOST_PORT}''',
@@ -102,7 +102,7 @@ pipeline {
                                     remoteDirectory: '/home/admin/artifacts',
                                     remoteDirectorySDF: false,
                                     removePrefix: '',
-                                    sourceFiles: '$IMAGE_NAME:$IMAGE_TAG.tar')],
+                                    sourceFiles: '${IMAGE_NAME}:${IMAGE_TAG}')],
                                     usePromotionTimestamp: false,
                                     useWorkspaceInPromotion: false,
                                     verbose: false)
