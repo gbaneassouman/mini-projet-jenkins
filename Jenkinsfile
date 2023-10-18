@@ -1,4 +1,4 @@
-/* groovylint-disable GStringExpressionWithinString, LineLength, NestedBlockDepth, NglParseError */
+/* groovylint-disable DuplicateStringLiteral, GStringExpressionWithinString, LineLength, NestedBlockDepth, NglParseError */
 /* groovylint-disable-next-line CompileStatic */
 /* groovylint-disable-next-line CompileStatic, NglParseError */
 pipeline {
@@ -81,35 +81,22 @@ pipeline {
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
                         '''
                     }
-                    // sshPublisher(
-                    //     publishers:
-                    //         [sshPublisherDesc(configName: 'staging-srv',
-                    //         transfers:
-                    //             [sshTransfer(cleanRemote: false,
-                    //             excludes: '',
-                    //             execCommand: '''
-                    //                 docker  load -i ${IMAGE_NAME}:${IMAGE_TAG}
-                    //                 sleep 10
-                    //                 /* groovylint-disable-next-line LineLength */
-                    //                 docker run --name ${IMAGE_NAME}:${IMAGE_TAG} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG
-                    //                 sleep 5
-                    //                 /* groovylint-disable-next-line LineLength */
-                    //                 curl 172.17.0.1:${HOST_PORT}''',
-                    //                 execTimeout: 120000,
-                    //                 flatten: false,
-                    //                 makeEmptyDirs: false,
-                    //                 noDefaultExcludes: false,
-                    //                 patternSeparator: '[, ]+',
-                    //                 /* groovylint-disable-next-line LineLength */
-                    //                 remoteDirectory: '/tmp/',
-                    //                 remoteDirectorySDF: false,
-                    //                 removePrefix: '',
-                    //                 sourceFiles: '**/*.tar')],
-                    //                 usePromotionTimestamp: false,
-                    //                 useWorkspaceInPromotion: false,
-                    //                 verbose: false)
-                    //         ]
-                    //     )
+                }
+            }
+        }
+        stage('Deploy to Prod') {
+            steps {
+                script {
+                    /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
+                    sshagent(['prod-area']) {
+                        sh '''
+                            echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            sleep 120
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD} docker run --name ${PROD_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
+                        '''
+                    }
                 }
             }
         }
