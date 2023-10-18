@@ -32,6 +32,7 @@ pipeline {
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
+                    sh 'docker stop ${CONTAINER}|| echo "already stopped"'
                     sh 'docker rm -f ${CONTAINER} || echo "container does not exist"'
                     sh 'docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}:${IMAGE_TAG}'
                     sh 'sleep 10'
