@@ -102,7 +102,7 @@ pipeline {
                                     remoteDirectory: '/tmp/',
                                     remoteDirectorySDF: false,
                                     removePrefix: '',
-                                    sourceFiles: '${IMAGE_NAME}:${IMAGE_TAG}')],
+                                    sourceFiles: '**/*.tar')],
                                     usePromotionTimestamp: false,
                                     useWorkspaceInPromotion: false,
                                     verbose: false)
