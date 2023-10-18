@@ -75,7 +75,10 @@ pipeline {
                     sshagent(['SSH-KEY']) {
                         sh '''
                             echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG} && sleep 120 && docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            sleep 120
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
                         '''
                     }
                     // sshPublisher(
