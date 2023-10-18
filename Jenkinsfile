@@ -32,8 +32,8 @@ pipeline {
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
-                    sh 'docker stop ${CONTAINER}|| echo "already stopped"'
-                    sh 'docker rm -f ${CONTAINER} || echo "container does not exist"'
+                    // sh 'docker stop ${CONTAINER}|| echo "already stopped"'
+                    // sh 'docker rm -f ${CONTAINER} || echo "container does not exist"'
                     sh 'docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}:${IMAGE_TAG}'
                     sh 'sleep 10'
                     sh 'curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"'
@@ -75,9 +75,7 @@ pipeline {
                     sshagent(['SSH-KEY']) {
                         sh '''
                             echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                            sleep 20
-                            docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG} sleep 50 docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                             touch text.txt
                             sh 'curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"'
                         '''
