@@ -74,9 +74,8 @@ pipeline {
                     /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
                     sshagent(['SSH-KEY']) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING}
                             echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
-                            docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                             sleep 20
                             docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                             touch text.txt
