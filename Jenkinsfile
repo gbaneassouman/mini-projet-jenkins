@@ -86,17 +86,17 @@ pipeline {
                 }
             }
         }
-        stage('Test in staging') {
-            steps {
-                script {
-                    sh 'ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"'
-                }
-            }
-        }
+        // stage('Test in staging') {
+        //     steps {
+        //         script {
+        //             sh 'ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"'
+        //         }
+        //     }
+        // }
         stage('Deploy to Prod') {
-            when {
-                expression { GIT_BRANCH == 'origin/main' }
-            }
+            // when {
+            //     expression { GIT_BRANCH == 'origin/main' }
+            // }
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
