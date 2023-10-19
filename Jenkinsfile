@@ -57,8 +57,8 @@ pipeline {
             steps {
                 script {
                 /* groovylint-disable-next-line GStringExpressionWithinString */
-                //ps aux  |  grep -i 5000  |  awk '{print $2}'  |  xargs sudo kill -9
-                //kill $(ps aux | grep '5000' | awk '{print $2}')
+                    //ps aux  |  grep -i 5000  |  awk '{print $2}'  |  xargs sudo kill -9
+                    //kill $(ps aux | grep '5000' | awk '{print $2}')
                     sh '''
                     docker stop ${CONTAINER}
                     docker rm -f ${CONTAINER}
@@ -86,7 +86,17 @@ pipeline {
                 }
             }
         }
+        stage('Test in staging') {
+            steps {
+                script {
+                    sh 'ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"'
+                }
+            }
+        }
         stage('Deploy to Prod') {
+            when {
+                expression { GIT_BRANCH == 'origin/main' }
+            }
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
