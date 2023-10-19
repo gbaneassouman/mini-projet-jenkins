@@ -1,4 +1,4 @@
-/* groovylint-disable DuplicateStringLiteral, GStringExpressionWithinString, LineLength, NestedBlockDepth, NglParseError */
+/* groovylint-disable DuplicateListLiteral, DuplicateStringLiteral, GStringExpressionWithinString, LineLength, NestedBlockDepth, NglParseError */
 /* groovylint-disable-next-line CompileStatic */
 /* groovylint-disable-next-line CompileStatic, NglParseError */
 pipeline {
@@ -89,7 +89,11 @@ pipeline {
         stage('Test in staging') {
             steps {
                 script {
-                    sh 'ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"'
+                    sshagent(['SSH-KEY']) {
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
+                        '''
+                    }
                 }
             }
         }
