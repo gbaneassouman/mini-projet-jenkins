@@ -75,6 +75,8 @@ pipeline {
                     sshagent(['SSH-KEY']) {
                         sh '''
                             echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker stop ${STAGING_NAME}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker rm ${STAGING_NAME}
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                             sleep 120
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
@@ -91,6 +93,8 @@ pipeline {
                     sshagent(['prod-area']) {
                         sh '''
                             echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker stop ${PROD_NAME}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker rm ${PROD_NAME}
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                             sleep 120
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD} docker run --name ${PROD_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
