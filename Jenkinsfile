@@ -6,6 +6,7 @@
 // @library('shared-library')
 /* groovylint-disable-next-line CompileStatic */
 @Library('slack-shared-library') _
+
 pipeline {
     environment {
         DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
@@ -103,8 +104,11 @@ pipeline {
             }
         }
         stage('Deploy to Prod') {
+            // when {
+            //     env.BRANCH_NAME == 'main'
+            // }
             when {
-                expression { GIT_BRANCH == 'origin/main' }
+                branch 'main'
             }
             steps {
                 script {
@@ -123,14 +127,14 @@ pipeline {
                 }
             }
         }
-        // post {
-        //     always {
-        //         script {
-        //             /* Use Slack-notification.groovy from shared library */
-        //             slack-notification currentBuild.result
-        //         }
-        //     }
-        // }
+    }
+    post {
+        always {
+            script {
+                /* Use Slack-notification.groovy from shared library */
+                slackNotifier currentBuild.result
+            }
+        }
     }
 }
 // }

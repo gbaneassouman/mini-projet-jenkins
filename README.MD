@@ -38,3 +38,85 @@ Afin d’accéder à jenkins en dehors de l’hôte , j’ai installé Apache2 e
 et  enfin configuré letsencrypt avec un sous-domaine.
 
 ![](jenkins-url.jpg)
+
+# Notification Slack 
+![](.logo/slack-2.svg)
+# 
+Nous allons intégrer slack à notre environnement jenkins pour recevoir directement des notifications après l'execution de notre pipeline.
+
+
+
+
+# Installation du plugin slack-notification
+
+Voici les étapes à suivre pour ajouter l’intégration Jenkins CI.
+
+### Étape 1
+Dans le tableau de bord Jenkins, cliquez sur Gérer Jenkins dans la barre de navigation à gauche.
+![](.logo/slack-1.png)
+
+### Étape 2
+Cliquez sur Plugins puis Available plugins et recherchez Notification Slack dans l’onglet search available plugins. Cochez la case et installez le plugin.
+
+![](.logo/slack-installation.png)
+
+### Étape 3 
+Une fois l’installation effectuée, cliquez de nouveau sur Administrer Jenkins dans le volet de navigation gauche, puis accédez à Configure System (Configurer le système).
+
+Recherchez la section Global Slack Notifier Settings (Paramètres de notification Slack globaux) et ajoutez les valeurs suivantes :
+
+Sous-domaine de l’équipe : **workspace**
+Identifiant d’authentification du jeton d’intégration : Créez un identifiant de  secret texte ayant pour valeur **Token**
+NB:
+Pour obtenir le **workspace** et **Token** il faut au préalable  comme suit:
+- 1 créer un compte slack 
+- 2 configurer l'intégration de jenkins à partir d'[ici](https://myspace.slack.com/services/new/jenkins-ci)
+
+
+
+![](.logo/slack-integration.png)
+
+à partir de cet instant on peux ajouter les notifications slack dans mon **Jenkinsfile**
+
+à fin de rendre disponible la notification slack à tous les projets, je vais la transformer en **Shared Library** ce qui va permettre de faire un simple appel dans les **Jenkinsfiles**.
+
+Pour ce faire j'ai :
+
+- créer un depôt **Github** [voir ici](https://github.com/gbaneassouman/shared-library/blob/main/vars/slackNotifier.groovy) et ajouter un fichier de type groovy appelé *(slackNotifier.groovy)* ensuite definir la fonction de notification
+![](.logo/slack-notifyer.png)
+
+- configurer la Shared Library à partir de ***Administrer jenkins -> System -> Global Pipeline Libraries***
+
+![](.logo/shared-library.png)
+
+- importer la Shared library précédemment configurée dans le Jenkinsfile 
+
+![](.logo/import-shared.png)
+- et faire appel à la fonction de notification
+
+![](.logo/slackNotifier.png)
+
+## Demo
+
+voir [ici](https://github.com/diranetafen/student-list.git "here")
+
+
+## 🚀 à propos de moi
+
+Session           : Bootcamp DevOps N°15 de EAZYTraining
+
+Période           : Septembre - Novembre
+
+Prénoms & Nom : Assouman GBANE 
+
+LinkedIn          : https://www.linkedin.com/in/gbane-assouman-4ab183123/
+
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`API_KEY`
+
+`ANOTHER_API_KEY`
+
