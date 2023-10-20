@@ -1,8 +1,11 @@
-/* import shared library */
-@library('shared-library')
+/* groovylint-disable NglParseError */
 /* groovylint-disable DuplicateListLiteral, DuplicateStringLiteral, GStringExpressionWithinString, LineLength, NestedBlockDepth, NglParseError */
 /* groovylint-disable-next-line CompileStatic */
 /* groovylint-disable-next-line CompileStatic, NglParseError */
+/* import shared library */
+// @library('shared-library')
+/* groovylint-disable-next-line CompileStatic */
+@Library('slack-shared-library') _
 pipeline {
     environment {
         DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
@@ -120,14 +123,14 @@ pipeline {
                 }
             }
         }
-        post {
-            always {
-                script {
-                    /* Use Slack-notification.groovy from shared library */
-                    slack-notification currentBuild.result
-                }
-            }
-        }
+        // post {
+        //     always {
+        //         script {
+        //             /* Use Slack-notification.groovy from shared library */
+        //             slack-notification currentBuild.result
+        //         }
+        //     }
+        // }
     }
 }
 // }
