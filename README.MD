@@ -58,7 +58,7 @@ Dans le tableau de bord Jenkins, cliquez sur Gérer Jenkins dans la barre de nav
 ### Étape 2
 Cliquez sur Plugins puis Available plugins et recherchez Notification Slack dans l’onglet search available plugins. Cochez la case et installez le plugin.
 
-![](.logo/plugins-slack.png)
+![](.logo/slack-installation.png)
 
 ### Étape 3 
 Une fois l’installation effectuée, cliquez de nouveau sur Administrer Jenkins dans le volet de navigation gauche, puis accédez à Configure System (Configurer le système).
