@@ -104,8 +104,11 @@ pipeline {
             }
         }
         stage('Deploy to Prod') {
+            // when {
+            //     env.BRANCH_NAME == 'main'
+            // }
             when {
-                env.BRANCH_NAME == 'main'
+                branch 'main'
             }
             steps {
                 script {
