@@ -127,12 +127,12 @@ pipeline {
                 }
             }
         }
-        post {
-            always {
-                script {
-                    /* Use Slack-notification.groovy from shared library */
-                    slackNotifier
-                }
+    }
+    post {
+        always {
+            script {
+                /* Use Slack-notification.groovy from shared library */
+                slackNotifier
             }
         }
     }
