@@ -128,7 +128,7 @@ pipeline {
             always {
                 script {
                     /* Use Slack-notification.groovy from shared library */
-                    slack-notification currentBuild.result
+                    slackNotifier
                 }
             }
         }
