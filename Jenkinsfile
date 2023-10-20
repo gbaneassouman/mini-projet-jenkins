@@ -1,3 +1,5 @@
+/* import shared library */
+@library('shared-library')
 /* groovylint-disable DuplicateListLiteral, DuplicateStringLiteral, GStringExpressionWithinString, LineLength, NestedBlockDepth, NglParseError */
 /* groovylint-disable-next-line CompileStatic */
 /* groovylint-disable-next-line CompileStatic, NglParseError */
@@ -115,6 +117,14 @@ pipeline {
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
                         '''
                     }
+                }
+            }
+        }
+        post {
+            always {
+                script {
+                    /* Use Slack-notification.groovy from shared library */
+                    slack-notification currentBuild.result
                 }
             }
         }
