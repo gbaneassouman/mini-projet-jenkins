@@ -105,7 +105,7 @@ pipeline {
         }
         stage('Deploy to Prod') {
             when {
-                { env.BRANCH_NAME == 'main' }
+                env.BRANCH_NAME == 'main'
             }
             steps {
                 script {
