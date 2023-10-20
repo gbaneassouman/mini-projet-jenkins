@@ -58,7 +58,7 @@ Dans le tableau de bord Jenkins, cliquez sur Gérer Jenkins dans la barre de nav
 ### Étape 2
 Cliquez sur Plugins puis Available plugins et recherchez Notification Slack dans l’onglet search available plugins. Cochez la case et installez le plugin.
 
-![](.logo/slack-installation.png)
+![](.logo/plugins-slack.png)
 
 ### Étape 3 
 Une fois l’installation effectuée, cliquez de nouveau sur Administrer Jenkins dans le volet de navigation gauche, puis accédez à Configure System (Configurer le système).
@@ -83,7 +83,25 @@ Pour obtenir le **workspace** et **Token** il faut au préalable  comme suit:
 Pour ce faire j'ai :
 
 - créer un depôt **Github** [voir ici](https://github.com/gbaneassouman/shared-library/blob/main/vars/slackNotifier.groovy) et ajouter un fichier de type groovy appelé *(slackNotifier.groovy)* ensuite definir la fonction de notification
-![](.logo/slack-notifyer.png)
+
+```
+#!/usr/bin/env groovy
+
+def call(String buildResult) {
+  if ( buildResult == "SUCCESS" ) {
+    slackSend color: "good", message: "CONGRATULATION: Job ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was successful ! more info ${env.BUILD_URL}"
+  }
+  else if( buildResult == "FAILURE" ) { 
+    slackSend color: "danger", message: "BAD NEWS:Job ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was failed ! more info ${env.BUILD_URL}"
+  }
+  else if( buildResult == "UNSTABLE" ) { 
+    slackSend color: "warning", message: "BAD NEWS:Job ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was unstable ! more info ${env.BUILD_URL}"
+  }
+  else {
+    slackSend color: "danger", message: "BAD NEWS:Job ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} its result was unclear ! more info ${env.BUILD_URL}"	
+  }
+}
+```
 
 - configurer la Shared Library à partir de ***Administrer jenkins -> System -> Global Pipeline Libraries***
 
