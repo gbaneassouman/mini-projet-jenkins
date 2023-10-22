@@ -104,11 +104,8 @@ pipeline {
             }
         }
         stage('Deploy to Prod') {
-            // when {
-            //     env.BRANCH_NAME == 'main'
-            // }
             when {
-                branch 'main'
+                expression { GIT_BRANCH == 'origin/main'}
             }
             steps {
                 script {
