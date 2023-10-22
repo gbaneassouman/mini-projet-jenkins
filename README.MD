@@ -3,13 +3,8 @@
 <div align="center">
 <img src="https://github.com/Tony-Dja/Jenkins_pipeline_HEROKU_deployment/blob/672b58d62fa5d424fb7162e33546c67f3bcbebc2/screenshots/jenkins.png" width="50%" height="50%">
 
-<img src="https://github.com/Tony-Dja/Jenkins_pipeline_HEROKU_deployment/blob/0adec933a113d173feee80d45760aa90133d1969/screenshots/heroku.png" width="50%" height="50%">
 </div>
-<div align="center">
 
-![Static Badge](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white)       ![Static Badge](https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white)        ![Static Badge](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)     ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)     ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
-
-</div>
 Ce Projet dénommé Mini projet jenkins a été réalisé dans le cadre ma formation DEVOPS au cours du Bootcamp numéro 15 de **EAZYTraining avec Dirane Tafen et Ulrich Monji** qui s'est deroulé de Septembre à Novembre 2023.
 
 
@@ -38,11 +33,55 @@ J’ai choisi 03 VPS de type Lightsail chez *AWS* *(01 pour Jenkins, 01 pour l'e
 ![](vps.png)
 Sur chaque VPS j’ai installé  Debian 11.4, docker et docker-compose
 Sur le VPS de jenkins :
-  j’ai installé jenkins à l’aide de docker-compose. Dans ma configuration le conteneur n’est accessible que sur la machine hôte à partir de  **127.0.0.1:8080**
-![](docker-ps-a.png)
+  j’ai installé jenkins à l’aide de docker-compose sur le vps jenkins. Dans ma configuration le conteneur n’est accessible que sur la machine hôte à partir de  **127.0.0.1:8080**
+
+```
+version: '3.3'
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    restart: always
+    privileged: true
+    user: root #update to set it for jenkins
+    ports:
+    - 127.0.0.1:8080:8080
+    volumes:
+      - /home/admin/.jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+```
+```
+CONTAINER ID   IMAGE                 COMMAND                  CREATED       STATUS       PORTS                                 NAMES
+342c609e0a56   jenkins/jenkins:lts   "/usr/bin/tini -- /u…"   11 days ago   Up 9 hours   127.0.0.1:8080->8080/tcp, 50000/tcp   jenkins
+```
+
 Afin d’accéder à jenkins en dehors de l’hôte , j’ai installé Apache2 et fais un reverse proxy sur le **127.0.0.1:8080**
 
-![](apache.png)
+```
+<VirtualHost *:80>
+        ServerName jenkins.xxxxx
+        ServerAdmin webmaster@localhost
+        ProxyPass         /  http://127.0.0.1:8080/ nocanon
+        ProxyPassReverse  /  http://127.0.0.1:8080/
+        ProxyRequests     Off
+        AllowEncodedSlashes NoDecode
+        RequestHeader set X-Forwarded-Proto "https"
+        RequestHeader set X-Forwarded-Port "443"
+        <Proxy http://127.0.0.1:8080/*>
+          Order deny,allow
+          Allow from all
+        </Proxy>
+        ErrorLog ${APACHE_LOG_DIR}/jenkins.error.log
+        CustomLog ${APACHE_LOG_DIR}/jenkins.access.log combined
+
+RewriteEngine on
+RewriteCond %{SERVER_NAME} =jenkins.xxxxx
+RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+```
 
 et  enfin configuré letsencrypt avec un sous-domaine.
 
@@ -52,8 +91,6 @@ et  enfin configuré letsencrypt avec un sous-domaine.
 ![](.logo/slack-2.svg)
 # 
 Nous allons intégrer slack à notre environnement jenkins pour recevoir directement des notifications après l'execution de notre pipeline.
-
-
 
 
 # Installation du plugin slack-notification
