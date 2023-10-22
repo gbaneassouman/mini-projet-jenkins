@@ -11,17 +11,18 @@ Ce Projet dénommé Mini projet jenkins a été réalisé dans le cadre ma forma
 ## Objectifs
 Il s’agit ici de mettre en œuvre une chaîne d’intégration continue pour un site web static *(voir image en dessous)* avec jenkins. le code source est [ici](https://github.com/diranetafen/static-website-example) .
 
-![](pipeline.png)
+![](screenshots/pipeline.png)
  
 ## À faire
 Pour la réalisation du project j'ai procédé comme suit:
-- 1 Provisionner 3 VPS 
-- 2 installer docker sur chaque vps <!--à partir de la documentation officielle qui se trouve [ici](https://docs.docker.com/engine/install/debian/)  -->
-- 3 Installer jenkins sur le vps 
-- 4 Produire le Dockerfile pour le Build
-- 5 Mettre en place le Pipeline
-- 6 Configurer github webhook
-- 7 Intégrer la notification slack
+- Provisionner 3 VPS 
+- Installer docker sur chaque vps 
+- Installer jenkins sur le vps 
+- Produire le Dockerfile pour le Build
+- Mettre en place le Pipeline
+  - Configuration de github webhook
+  - Intégration de la notification slack
+  - Production du Jenkinsfile
 
 
 
@@ -30,10 +31,13 @@ J'ai suivi les étapes ci-dessous pour la réalisation du projet.
 
 J’ai choisi 03 VPS de type Lightsail chez *AWS* *(01 pour Jenkins, 01 pour l'environnement de staging et le dernier pour l'environnement de la Prod)*
 
-![](vps.png)
-Sur chaque VPS j’ai installé  Debian 11.4, docker et docker-compose
+![](screenshots/vps.png)
+Sur chaque VPS j’ai installé:
+- Debian 11.4
+- docker et docker-compose en suivant la documentation qui se trouve [ici](https://docs.docker.com/engine/install/debian/)
+
 Sur le VPS de jenkins :
-  j’ai installé jenkins à l’aide de docker-compose sur le vps jenkins. Dans ma configuration le conteneur n’est accessible que sur la machine hôte à partir de  **127.0.0.1:8080**
+- Jenkins a été installé à l’aide d'un fichier docker-compose . Dans cette configuration le conteneur n’est accessible que sur la machine hôte à partir de  **127.0.0.1:8080**
 
 ```
 version: '3.3'
@@ -42,7 +46,7 @@ services:
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins
-    restart: always
+    restart: alwaysIntrégation de la notification Slack 
     privileged: true
     user: root #update to set it for jenkins
     ports:
@@ -85,26 +89,107 @@ RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 
 et  enfin configuré letsencrypt avec un sous-domaine.
 
-![](jenkins-url.jpg)
+![](screenshots/jenkins-url.jpg)
 
-# Intrégation de la notification Slack 
-![](.logo/slack-2.svg)
+# Dockerfile 
+Voici ci-dessous le dockerfile qui a permit de créer l'image Docker à partir de laquelle nos conteneurs seront créées.
+```
+FROM nginx:latest
+LABEL maintainer="GBANE Assouman gbane.assouman@gmail.com"
+WORKDIR /usr/share/nginx/html
+COPY . .
+EXPOSE 80
+CMD [ "nginx","-g","daemon off;" ]
+
+```
+- <strong>image de base Docker</strong><br/>
+FROM nginx:latest<br/>
+LABEL maintainer="GBANE Assouman gbane.assouman@gmail.com"
+
+- <strong>Répertoire du site</strong><br/>
+WORKDIR /usr/share/nginx/html
+
+- <strong>Copie des fichiers dans le répertoire</strong><br/>
+COPY . .
+
+- <strong>Port d'écoute de NGINX </strong><br/>
+EXPOSE 80
+
+- <strong>Démarrage de NGINX</strong><br/>
+CMD [ "nginx","-g","daemon off;" ]
+
+# Mise en place du Pipeline
+Pour la mise du pipeline il faut:
+- installer les plugins necéssaires
+- créer des credentials
+- créer le pipeline
+  
+<strong>Installation des plugins </strong><br/>
+Pour l'installation des puglins necéssaires au pipeline on va dans 
+
+**Tableau de bord -> Administrer jenkins -> Plugins -> Available plugins** puis chercher et installer les plugins suivants:
+- Docker 
+- Docker pipeline
+- Docker plugin
+- Github integration Plugin
+- SSH Agent plugin
+
+<strong>Création des crédentials</strong><br/>
+Afin de pusher l'image buildée sur Docherhub *(hub.docker.com)* et de se connecter sur les serveurs de staging et de prod via ssh on va créer les identifiants ci-dessous:
+- dockerhub-credential de type Nom d'utilisateur et mot de passe
+- SSH-KEY de type SSH Username with private key	ici on copie la clé privée de connexion du serveur de staging
+- prod-area de type SSH Username with private key	ici on copie la clé privée de connexion du serveur de la prod
+- slack-text de type Secret text	pour l'intégration de slack
+
+il faut au préalable aller dans **Tableau de bord -> Administrer jenkins -> credentials**
+
+![](screenshots/credentials.png)
+
+<strong>Création du pipeline</strong><br/>
+
+Pour créer un nouveau pipeline il faut cliquer sur nouveau item à gauche dans le Dashboard
+
+![](screenshots/staticweb.png)
+
+## Configuration du webhook
+
+Pour déclencher automatiquement le lancement du pipeline à partir d'une action réalisée sur GitHub 
+il faut:
+- Renseigner l'url du repository dans le pipeline 
+- Autoriser le déclenchement du webhook
+  
+![](screenshots/webhook-trigger.png)
+
+- Configurer le webhook depuis le repository github
+  
+![](screenshots/github-webhook.png)
+
+confirmation que le webhook marche
+
+![](screenshots/webhook-conf.png)
+
+![](screenshots/triger.png)
+
+Le pipeline sera basée sur un Jenkinsfile donc dans la section pipeline de la configuration il faut choisir **Pipeline script from SCM**
+![](screenshots/choix-jenkins.png)
+
+## Intrégation de la notification Slack 
+![](https://www.vectorlogo.zone/logos/slack/slack-ar21.svg)
 # 
 Nous allons intégrer slack à notre environnement jenkins pour recevoir directement des notifications après l'execution de notre pipeline.
 
-
-# Installation du plugin slack-notification
+- <strong>Installation du plugin slack-notification</strong><br/>
 
 Voici les étapes à suivre pour ajouter l’intégration Jenkins CI.
 
 ### Étape 1
 Dans le tableau de bord Jenkins, cliquez sur Administrer Jenkins dans la barre de navigation à gauche.
-![](.logo/slack-1.png)
+![](screenshots/slack-1.png)
 
 ### Étape 2
 Cliquez sur Plugins puis Available plugins et recherchez Slack Notification dans l’onglet search available plugins. Cochez la case et installez le plugin.
 
-![](.logo/slack-installation.png)
+![](screenshots/slack-installation.png)
 
 ### Étape 3 
 Une fois l’installation effectuée, cliquez de nouveau sur Administrer Jenkins dans le volet de navigation gauche, puis accédez à **Configure System** (Configurer le système).
@@ -118,17 +203,15 @@ Pour obtenir le **workspace** et **Token** il faut au préalable:
 - 1 créer un compte slack 
 - 2 configurer l'intégration de jenkins à partir d'[ici](https://myspace.slack.com/services/new/jenkins-ci)
 
-
-
-![](.logo/slack-integration.png)
+![](screenshots/slack-integration.png)
 
 à partir de cet instant on peux ajouter les notifications slack dans le **Jenkinsfile**
 
-à fin de rendre disponible la notification slack à tous les projets, je l'ai transformé en **Shared Library** ce qui va permettre de faire un simple appel dans les **Jenkinsfiles**.
+à fin de rendre disponible la notification slack à tous les projets, je l'ai transformé en **Shared Library** qui va permettre de faire un simple appel dans les **Jenkinsfiles**.
 
 Pour ce faire j'ai :
 
-- créée un depôt **Github** [voir ici](https://github.com/gbaneassouman/shared-library/blob/main/vars/slackNotifier.groovy) et ajouté un fichier de type groovy appelé *(slackNotifier.groovy)* ensuite definir la fonction de notification
+- créée un depôt **Github** [voir ici](https://github.com/gbaneassouman/shared-library/blob/main/vars/slackNotifier.groovy) et ajouté un fichier de type groovy appelé *slackNotifier.groovy* ensuite definir la fonction de notification
 
 ```
 #!/usr/bin/env groovy
@@ -151,18 +234,42 @@ def call(String buildResult) {
 
 - configurer la Shared Library à partir de ***Administrer jenkins -> System -> Global Pipeline Libraries***
 
-![](.logo/shared-library.png)
+![](screenshots/shared-library.png)
 
 - importer la Shared library précédemment configurée dans le Jenkinsfile 
 
-![](.logo/import-shared.png)
-- et faire appel à la fonction de notification
+```
+@Library('slack-shared-library') _
 
-![](.logo/slackNotifier.png)
+```
+- et faire appel à la fonction de notification en dehors de la balise des stages
 
-## Demo
+```
+post {
+        always {
+            script {
+                /* Use Slack-notification.groovy from shared library */
+                slackNotifier currentBuild.result
+            }
+        }
+    }
+```
+## Production de jenkinsfile 
+Le Jenkinsfile contient 08 stages et un Post Actions pour slack
 
-voir [ici](https://github.com/diranetafen/student-list.git "here")
+Les Stages sont:
+- Cloning code
+- Build Image
+- Test Image
+- Release image
+- Clean image
+- Deploy to Satging
+- Test in staging
+- Deploy to Prod
+et les éléments ci-dessous ont été variabilisés pour faciliter leur réutilisation dans les différents stages:
+
+IMAGE_NAME, IMAGE_TAG, DOCKER_HUB, HOST_PORT, INTERNAL_PORT, CONTAINER, STAGING_IP, PROD_IP, USER_NAME, STAGING_NAME, PROD_NAME
+
 
 
 ## 🚀 à propos de moi
