@@ -104,9 +104,6 @@ pipeline {
             }
         }
         stage('Deploy to Prod') {
-            when {
-                expression { GIT_BRANCH == 'origin/main'}
-            }
             steps {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
