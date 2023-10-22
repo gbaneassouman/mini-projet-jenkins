@@ -1,27 +1,29 @@
 
 # Mini Projet Jenkins
 <div align="center">
-<img src="https://github.com/Tony-Dja/Jenkins_pipeline_HEROKU_deployment/blob/672b58d62fa5d424fb7162e33546c67f3bcbebc2/screenshots/jenkins.png" width="50%" height="50%">
+<img src="screenshots/jenkins-logo.png" width="50%" height="50%">
 
 </div>
 
-Ce Projet dénommé Mini projet jenkins a été réalisé dans le cadre ma formation DEVOPS au cours du Bootcamp numéro 15 de **EAZYTraining avec Dirane Tafen et Ulrich Monji** qui s'est deroulé de Septembre à Novembre 2023.
+Ce Projet dénommé Mini projet jenkins a été réalisé dans le cadre ma formation DEVOPS au 15ième Bootcamp de **EAZYTraining** de Septembre à Novembre 2023.
+
 
 
 ## Objectifs
-Il s’agit ici de mettre en œuvre une chaîne d’intégration continue pour un site web static *(voir image en dessous)* avec jenkins. le code source est [ici](https://github.com/diranetafen/static-website-example) .
+Il s’agit ici de mettre en œuvre une chaîne d’intégration continue pour un site web static *(voir image en dessous)* avec jenkins. le code source du site est [ici](https://github.com/diranetafen/static-website-example) .
 
-![](pipeline.png)
+![](screenshots/pipeline.png)
  
-## À faire
-Pour la réalisation du project j'ai procédé comme suit:
-- 1 Provisionner 3 VPS 
-- 2 installer docker sur chaque vps <!--à partir de la documentation officielle qui se trouve [ici](https://docs.docker.com/engine/install/debian/)  -->
-- 3 Installer jenkins sur le vps 
-- 4 Produire le Dockerfile pour le Build
-- 5 Mettre en place le Pipeline
-- 6 Configurer github webhook
-- 7 Intégrer la notification slack
+## Tâches réalisées
+Pour la réalisation de ce project j'ai effectuée les tâches ci-dessous:
+- Provisionner 3 VPS 
+- Installer docker sur chaque vps 
+- Installer jenkins sur un des vps 
+- Produire le Dockerfile pour le Build
+- Mettre en place le Pipeline
+  - Configuration de github webhook
+  - Intégration de la notification slack
+  - Production du Jenkinsfile
 
 
 
@@ -30,10 +32,13 @@ J'ai suivi les étapes ci-dessous pour la réalisation du projet.
 
 J’ai choisi 03 VPS de type Lightsail chez *AWS* *(01 pour Jenkins, 01 pour l'environnement de staging et le dernier pour l'environnement de la Prod)*
 
-![](vps.png)
-Sur chaque VPS j’ai installé  Debian 11.4, docker et docker-compose
+![](screenshots/vps.png)
+Sur chaque VPS j’ai installé:
+- Debian 11.4
+- docker et docker-compose en suivant la documentation qui se trouve [ici](https://docs.docker.com/engine/install/debian/)
+
 Sur le VPS de jenkins :
-  j’ai installé jenkins à l’aide de docker-compose sur le vps jenkins. Dans ma configuration le conteneur n’est accessible que sur la machine hôte à partir de  **127.0.0.1:8080**
+- Jenkins a été installé à l’aide d'un fichier docker-compose . Dans cette configuration le conteneur n’est accessible que sur la machine hôte à partir de  **127.0.0.1:8080**
 
 ```
 version: '3.3'
@@ -42,7 +47,7 @@ services:
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins
-    restart: always
+    restart: alwaysIntrégation de la notification Slack 
     privileged: true
     user: root #update to set it for jenkins
     ports:
@@ -83,28 +88,110 @@ RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 
 ```
 
-et  enfin configuré letsencrypt avec un sous-domaine.
+et  enfin installé et configuré letsencrypt avec un sous-domaine sur chaque VPS.
 
-![](jenkins-url.jpg)
+![](screenshots/jenkins-url.jpg)
 
-# Intrégation de la notification Slack 
-![](.logo/slack-2.svg)
+# Dockerfile 
+Voici ci-dessous le dockerfile qui a permit de créer l'image Docker à partir de laquelle nos conteneurs seront créées.
+```
+FROM nginx:latest
+LABEL maintainer="GBANE Assouman gbane.assouman@gmail.com"
+WORKDIR /usr/share/nginx/html
+COPY . .
+EXPOSE 80
+CMD [ "nginx","-g","daemon off;" ]
+
+```
+- <strong>image de base Docker</strong><br/>
+FROM nginx:latest<br/>
+LABEL maintainer="GBANE Assouman gbane.assouman@gmail.com"
+
+- <strong>Répertoire du site</strong><br/>
+WORKDIR /usr/share/nginx/html
+
+- <strong>Copie des fichiers dans le répertoire WORKDIR</strong><br/>
+COPY . .
+
+- <strong>Port d'écoute de NGINX </strong><br/>
+EXPOSE 80
+
+- <strong>Démarrage de NGINX</strong><br/>
+CMD [ "nginx","-g","daemon off;" ]
+
+# Mise en place du Pipeline
+Pour la mise en place du pipeline il faut:
+- installer les plugins necéssaires
+- créer des credentials
+- créer un nouveau item de type pipeline
+  
+<strong>Installation des plugins </strong><br/>
+Pour l'installation des puglins necéssaires au pipeline on va dans 
+
+**Tableau de bord -> Administrer jenkins -> Plugins -> Available plugins** puis chercher et installer les plugins suivants:
+- Docker 
+- Docker pipeline
+- Docker plugin
+- Github integration Plugin
+- SSH Agent plugin
+
+<strong>Création des crédentials</strong><br/>
+Afin de pusher l'image buildée sur Docherhub *(hub.docker.com)* et de se connecter sur les serveurs de staging et de prod via ssh on va créer les identifiants ci-dessous:
+- dockerhub-credential de type Nom d'utilisateur et mot de passe pour **Dockerhub**
+- SSH-KEY de type SSH Username with private key	(copier la clé privée de connexion du serveur de staging)
+- prod-area de type SSH Username with private key	(copier la clé privée de connexion du serveur de la prod)
+- slack-text de type Secret text	pour l'intégration de slack 
+
+il faut au préalable aller dans **Tableau de bord -> Administrer jenkins -> credentials** pour la création des credentials
+
+![](screenshots/credentials.png)
+
+<strong>Création du pipeline</strong><br/>
+
+Pour créer un nouveau pipeline il faut cliquer sur nouveau item à gauche dans le Dashboard puis Pipeline
+
+![](screenshots/staticweb.png)
+
+## Configuration du webhook
+
+Pour déclencher automatiquement le lancement du pipeline à partir d'une action réalisée sur GitHub 
+il faut:
+- Renseigner l'url du repository dans le pipeline 
+- Autoriser le déclenchement du webhook
+  
+![](screenshots/webhook-trigger.png)
+
+- Configurer le webhook depuis le repository github
+  
+![](screenshots/github-webhook.png)
+
+confirmation que le webhook marche
+
+![](screenshots/webhook-conf.png)
+
+![](screenshots/triger.png)
+
+Le pipeline sera basée sur un Jenkinsfile donc dans la section pipeline de la configuration il faut choisir **Pipeline script from SCM**
+
+![](screenshots/choix-jenkins.png)
+
+## Intrégation de la notification Slack 
+![](https://www.vectorlogo.zone/logos/slack/slack-ar21.svg)
 # 
 Nous allons intégrer slack à notre environnement jenkins pour recevoir directement des notifications après l'execution de notre pipeline.
 
-
-# Installation du plugin slack-notification
+- <strong>Installation du plugin slack-notification</strong><br/>
 
 Voici les étapes à suivre pour ajouter l’intégration Jenkins CI.
 
 ### Étape 1
 Dans le tableau de bord Jenkins, cliquez sur Administrer Jenkins dans la barre de navigation à gauche.
-![](.logo/slack-1.png)
+![](screenshots/slack-1.png)
 
 ### Étape 2
 Cliquez sur Plugins puis Available plugins et recherchez Slack Notification dans l’onglet search available plugins. Cochez la case et installez le plugin.
 
-![](.logo/slack-installation.png)
+![](screenshots/slack-installation.png)
 
 ### Étape 3 
 Une fois l’installation effectuée, cliquez de nouveau sur Administrer Jenkins dans le volet de navigation gauche, puis accédez à **Configure System** (Configurer le système).
@@ -118,17 +205,15 @@ Pour obtenir le **workspace** et **Token** il faut au préalable:
 - 1 créer un compte slack 
 - 2 configurer l'intégration de jenkins à partir d'[ici](https://myspace.slack.com/services/new/jenkins-ci)
 
-
-
-![](.logo/slack-integration.png)
+![](screenshots/slack-integration.png)
 
 à partir de cet instant on peux ajouter les notifications slack dans le **Jenkinsfile**
 
-à fin de rendre disponible la notification slack à tous les projets, je l'ai transformé en **Shared Library** ce qui va permettre de faire un simple appel dans les **Jenkinsfiles**.
+à fin de rendre disponible la notification slack à tous les projets, je l'ai transformé en **Shared Library** qui va permettre de faire un simple appel dans les **Jenkinsfiles**.
 
 Pour ce faire j'ai :
 
-- créée un depôt **Github** [voir ici](https://github.com/gbaneassouman/shared-library/blob/main/vars/slackNotifier.groovy) et ajouté un fichier de type groovy appelé *(slackNotifier.groovy)* ensuite definir la fonction de notification
+- créée un depôt **Github** [voir ici](https://github.com/gbaneassouman/shared-library/blob/main/vars/slackNotifier.groovy) et ajouté un fichier de type groovy appelé *slackNotifier.groovy* ensuite definir la fonction de notification ci-dessous
 
 ```
 #!/usr/bin/env groovy
@@ -151,36 +236,209 @@ def call(String buildResult) {
 
 - configurer la Shared Library à partir de ***Administrer jenkins -> System -> Global Pipeline Libraries***
 
-![](.logo/shared-library.png)
+![](screenshots/shared-library.png)
 
 - importer la Shared library précédemment configurée dans le Jenkinsfile 
 
-![](.logo/import-shared.png)
-- et faire appel à la fonction de notification
+```
+@Library('slack-shared-library') _
 
-![](.logo/slackNotifier.png)
+```
+- et faire appel à la fonction de notification en dehors de la balise des stages
 
-## Demo
+```
+post {
+        always {
+            script {
+                /* Use Slack-notification.groovy from shared library */
+                slackNotifier currentBuild.result
+            }
+        }
+    }
+```
+## Production de jenkinsfile 
+Le Jenkinsfile contient **08 stages** et un **Post Actions** pour slack
 
-voir [ici](https://github.com/diranetafen/student-list.git "here")
+Les Stages sont:
+- Cloning code *(recupère le code sur github)*
+- Build Image  *(Build de l'image)*
+- Test Image  *(test de l'image en créant un conteneur)*
+- Release image *(envoie l'image sur dockerhub)*
+- Clean image  *(arrête et supprime l'image)*
+- Deploy to Satging
+- Test in staging
+- Deploy to Prod
+
+et les éléments ci-dessous ont été variabilisés pour faciliter leur réutilisation dans les différents stages:
+
+IMAGE_NAME, IMAGE_TAG, DOCKER_HUB, HOST_PORT, INTERNAL_PORT, CONTAINER, STAGING_IP, PROD_IP, USER_NAME, STAGING_NAME, PROD_NAME
+
+<strong>Jenkinsfile</strong><br/>
+```
+/* groovylint-disable NglParseError */
+/* groovylint-disable DuplicateListLiteral, DuplicateStringLiteral, GStringExpressionWithinString, LineLength, NestedBlockDepth, NglParseError */
+/* groovylint-disable-next-line CompileStatic */
+/* groovylint-disable-next-line CompileStatic, NglParseError */
+/* import shared library */
+// @library('shared-library')
+/* groovylint-disable-next-line CompileStatic */
+@Library('slack-shared-library') _
+
+pipeline {
+    environment {
+        DOCKERHUB_PASSWORD  = credentials('dockerhub-credentials')
+    }
+    agent any //declaration globale de l'agent
+    stages {
+        stage('Cloning code') {
+            steps {
+                script {
+                    sh '''
+                        rm -rf mini-projet-jenkins || echo "Directory doesn't exists "
+                        sleep 2
+                        git clone https://github.com/gbaneassouman/mini-projet-jenkins.git
+                    '''
+                }
+            }
+        }
+        stage('Build image') {
+            steps {
+                script {
+                    /* groovylint-disable-next-line GStringExpressionWithinString */
+                    sh '''
+                        docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                    '''
+                }
+            }
+        }
+        stage('Test image') {
+            steps {
+                script {
+                    /* groovylint-disable-next-line GStringExpressionWithinString */
+                    // sh 'docker stop ${CONTAINER}|| echo "already stopped"'
+                    // sh 'docker rm -f ${CONTAINER} || echo "container does not exist"'
+                    sh 'docker run --name ${CONTAINER} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${IMAGE_NAME}:${IMAGE_TAG}'
+                    sh 'sleep 10'
+                    sh 'curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"'
+                }
+            }
+        }
+        stage('Release image') {
+            steps {
+                script {
+                    /* groovylint-disable-next-line GStringExpressionWithinString */
+                    sh '''
+                        docker save ${IMAGE_NAME}:${IMAGE_TAG} > /tmp/${IMAGE_NAME}:${IMAGE_TAG}.tar
+                        docker image tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                        echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
+                        docker push ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                    '''
+                }
+            }
+        }
+        stage('Clean image') {
+            steps {
+                script {
+                /* groovylint-disable-next-line GStringExpressionWithinString */
+                    //ps aux  |  grep -i 5000  |  awk '{print $2}'  |  xargs sudo kill -9
+                    //kill $(ps aux | grep '5000' | awk '{print $2}')
+                    sh '''
+                    docker stop ${CONTAINER}
+                    docker rm -f ${CONTAINER}
+                    docker rmi -f ${IMAGE_NAME}
+                    docker rmi -f ${DOCKER_HUB}/${IMAGE_NAME}
+                '''
+                }
+            }
+        }
+        stage('Deploy to Satging') {
+            steps {
+                script {
+                    /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
+                    sshagent(['SSH-KEY']) {
+                        sh '''
+                            echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker stop ${STAGING_NAME}||echo "stopped"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker rm ${STAGING_NAME}||echo "already deleted"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            sleep 120
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Test in staging') {
+            steps {
+                script {
+                    sshagent(['SSH-KEY']) {
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Deploy to Prod') {
+            steps {
+                script {
+                    /* groovylint-disable-next-line GStringExpressionWithinString, NestedBlockDepth */
+                    sshagent(['prod-area']) {
+                        sh '''
+                            echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker stop ${PROD_NAME}||echo "stopped"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker rm ${PROD_NAME}||echo "already deleted"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            sleep 120
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker run --name ${PROD_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
+                        '''
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                /* Use Slack-notification.groovy from shared library */
+                slackNotifier currentBuild.result
+            }
+        }
+    }
+}
+```
+<strong>Résultat de l'execution du script </strong><br/>
+
+<div align="center">
+<img src="screenshots/pipeline-full.png" width="100%" height="100%"><br/>
+</div>
+
+#
+<strong>Notification Slack </strong><br/>
+
+<div align="center">
+<img src="screenshots/notification-slack.png" width="100%" height="100%"><br/>
+</div>
+
+#
+<strong>Test in staging	 </strong><br/>
+
+<div align="center">
+<img src="screenshots/staging-test2.png" width="100%" height="100%"><br/>
+</div>
+
+#
+<strong>Test in Prod	 </strong><br/>
+
+<div align="center">
+<img src="screenshots/prod-test.png" width="100%" height="100%"><br/>
+</div>
 
 
-## 🚀 à propos de moi
+## 🚀 Conclusion
+Ce fut une expérience enrichissante pour moi car ce module m'a permis de mettre en pratique les connaissances acquises sur Docker, et Jenkins
 
-Session           : Bootcamp DevOps N°15 de EAZYTraining
-
-Période           : Septembre - Novembre
-
-Prénoms & Nom : Assouman GBANE 
-
+Assouman GBANE 
 LinkedIn          : https://www.linkedin.com/in/gbane-assouman-4ab183123/
-
-
-## Environment Variables
-
-To run this project, you will need to add the following environment variables to your .env file
-
-`API_KEY`
-
-`ANOTHER_API_KEY`
-
