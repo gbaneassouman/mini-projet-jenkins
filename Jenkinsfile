@@ -81,12 +81,12 @@ pipeline {
                     sshagent(['SSH-KEY']) {
                         sh '''
                             echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker stop ${STAGING_NAME}||echo "stopped"
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker rm ${STAGING_NAME}||echo "already deleted"
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                            sleep 120
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker stop ${STAGING_NAME}||echo "stopped"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker rm ${STAGING_NAME}||echo "already deleted"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            sleep 120_IP
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
                         '''
                     }
                 }
@@ -97,7 +97,7 @@ pipeline {
                 script {
                     sshagent(['SSH-KEY']) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
                         '''
                     }
                 }
@@ -110,12 +110,12 @@ pipeline {
                     sshagent(['prod-area']) {
                         sh '''
                             echo $DOCKERHUB_PASSWORD_PSW | docker login -u ${DOCKER_HUB} --password-stdin
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker stop ${PROD_NAME}||echo "stopped"
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING} docker rm ${PROD_NAME}||echo "already deleted"
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                            sleep 120
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD} docker run --name ${PROD_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker stop ${PROD_NAME}||echo "stopped"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker rm ${PROD_NAME}||echo "already deleted"
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            sleep 120_IP
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker run --name ${PROD_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                            ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
                         '''
                     }
                 }
