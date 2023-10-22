@@ -84,7 +84,7 @@ pipeline {
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker stop ${STAGING_NAME}||echo "stopped"
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker rm ${STAGING_NAME}||echo "already deleted"
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                            sleep 120_IP
+                            sleep 120
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} docker run --name ${STAGING_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${STAGING_IP} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
                         '''
@@ -113,7 +113,7 @@ pipeline {
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker stop ${PROD_NAME}||echo "stopped"
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker rm ${PROD_NAME}||echo "already deleted"
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker pull ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                            sleep 120_IP
+                            sleep 120
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} docker run --name ${PROD_NAME} -d -p ${HOST_PORT}:${INTERNAL_PORT} ${DOCKER_HUB}/${IMAGE_NAME}:${IMAGE_TAG}
                             ssh -o StrictHostKeyChecking=no -l ${USER_NAME} ${PROD_IP} curl -k http://172.17.0.1:${HOST_PORT}|grep -i "DIMENSION"
                         '''
