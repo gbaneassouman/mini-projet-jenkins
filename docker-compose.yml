@@ -1,0 +1,15 @@
+version: '3.3'
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    restart: always
+    privileged: true
+    user: root #update to set it for jenkins
+    ports:
+    - 127.0.0.1:8080:8080
+    volumes:
+      - /home/admin/.jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
