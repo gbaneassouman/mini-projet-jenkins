@@ -412,12 +412,12 @@ pipeline {
 <strong>Résultat de l'execution du script </strong><br/>
 
 <div align="center">
-<img src="screenshots/pipeline-full.png" width="100%" height="100%">
+<img src="screenshots/pipeline-full.png" width="100%" height="100%"><br/>
 </div>
 
 <strong>Notification Slack </strong><br/>
 <div align="center">
-<img src="screenshots/notification-slack.png" width="100%" height="100%">
+<img src="screenshots/notification-slack.png" width="100%" height="100%"><br/>
 </div>
 
 <strong>Test in staging	 </strong><br/>
@@ -428,7 +428,7 @@ pipeline {
 
 <strong>Test in Prod	 </strong><br/>
 <div align="center">
-<img src="screenshots/prod-test.png" width="100%" height="100%">
+<img src="screenshots/prod-test.png" width="100%" height="100%"><br/>
 </div>
 
 
