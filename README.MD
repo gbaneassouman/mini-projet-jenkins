@@ -17,10 +17,10 @@ Il s’agit ici de mettre en œuvre une chaîne d’intégration continue pour u
 ## Tâches réalisées
 Pour la réalisation de ce project j'ai effectuée les tâches ci-dessous:
 - Provisionner 3 VPS 
-- Installer docker sur chaque vps 
-- Installer jenkins sur un des vps 
-- Produire le Dockerfile pour le Build
-- Mettre en place le Pipeline
+- Installation de docker sur chaque vps 
+- Installation jenkins sur un des vps 
+- Production du Dockerfile pour le Build
+- Mise en place du Pipeline
   - Configuration de github webhook
   - Intégration de la notification slack
   - Production du Jenkinsfile
@@ -30,7 +30,7 @@ Pour la réalisation de ce project j'ai effectuée les tâches ci-dessous:
 ## Plan de Travail
 J'ai suivi les étapes ci-dessous pour la réalisation du projet.
 
-J’ai choisi 03 VPS de type Lightsail chez *AWS* *(01 pour Jenkins, 01 pour l'environnement de staging et le dernier pour l'environnement de la Prod)*
+mon choix s'est porté sur des VPS de type Lightsail de *AWS* *(01 pour Jenkins, 01 pour l'environnement de staging et le dernier pour l'environnement de la Prod)*
 
 ![](screenshots/vps.png)
 Sur chaque VPS j’ai installé:
@@ -47,7 +47,7 @@ services:
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins
-    restart: alwaysIntrégation de la notification Slack 
+    restart: always
     privileged: true
     user: root #update to set it for jenkins
     ports:
@@ -185,22 +185,26 @@ Nous allons intégrer slack à notre environnement jenkins pour recevoir directe
 Voici les étapes à suivre pour ajouter l’intégration Jenkins CI.
 
 ### Étape 1
-Dans le tableau de bord Jenkins, cliquez sur Administrer Jenkins dans la barre de navigation à gauche.
+Dans le tableau de bord Jenkins, cliquer sur Administrer Jenkins dans la barre de navigation à gauche.
 ![](screenshots/slack-1.png)
 
 ### Étape 2
-Cliquez sur Plugins puis Available plugins et recherchez Slack Notification dans l’onglet search available plugins. Cochez la case et installez le plugin.
+Cliquer sur Plugins puis Available plugins et rechercher Slack Notification dans l’onglet search available plugins. Cochez la case et installer le plugin.
 
 ![](screenshots/slack-installation.png)
 
 ### Étape 3 
-Une fois l’installation effectuée, cliquez de nouveau sur Administrer Jenkins dans le volet de navigation gauche, puis accédez à **Configure System** (Configurer le système).
+Une fois l’installation effectuée, cliquer de nouveau sur Administrer Jenkins dans le volet de navigation gauche, puis accéder à **Configure System** (Configurer le système).
 
-Recherchez la section **Global Slack Notifier Settings** (Paramètres de notification Slack globaux) et ajoutez les valeurs suivantes :
+Rechercher la section **Global Slack Notifier Settings** (Paramètres de notification Slack globaux) et ajouter les valeurs suivantes :
 
 Sous-domaine de l’équipe : **workspace**
-Identifiant d’authentification où jeton d’intégration : Créez un identifiant de type secret texte ayant pour valeur **Token**
+Identifiant d’authentification où jeton d’intégration : 
+
+Créez un identifiant de type secret texte ayant pour valeur **Token**
+
 NB:
+
 Pour obtenir le **workspace** et **Token** il faut au préalable:
 - 1 créer un compte slack 
 - 2 configurer l'intégration de jenkins à partir d'[ici](https://myspace.slack.com/services/new/jenkins-ci)
@@ -441,4 +445,5 @@ pipeline {
 Ce fut une expérience enrichissante pour moi car ce module m'a permis de mettre en pratique les connaissances acquises sur Docker, et Jenkins
 
 Assouman GBANE 
-LinkedIn          : https://www.linkedin.com/in/gbane-assouman-4ab183123/
+
+Linkedin  : https://www.linkedin.com/in/gbane-assouman
