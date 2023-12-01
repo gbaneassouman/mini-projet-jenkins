@@ -29,7 +29,7 @@ pipeline {
                 script {
                     /* groovylint-disable-next-line GStringExpressionWithinString */
                     sh '''
-                        docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                        docker build --no-cache -t ${IMAGE_NAME}:${IMAGE_TAG} .
                     '''
                 }
             }
