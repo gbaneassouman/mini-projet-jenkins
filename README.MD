@@ -217,7 +217,7 @@ Pour obtenir le **workspace** et **Token** il faut au préalable:
 
 Pour ce faire j'ai :
 
-- créée un depôt **Github** [voir ici](https://github.com/gbaneassouman/shared-library/blob/main/vars/slackNotifier.groovy) et ajouté un fichier de type groovy appelé *slackNotifier.groovy* ensuite definir la fonction de notification ci-dessous
+- crée un depôt **Github** [voir ici](https://github.com/gbaneassouman/shared-library/blob/main/vars/slackNotifier.groovy) et ajouté un fichier de type groovy appelé *slackNotifier.groovy* ensuite definir la fonction de notification ci-dessous
 
 ```
 #!/usr/bin/env groovy
